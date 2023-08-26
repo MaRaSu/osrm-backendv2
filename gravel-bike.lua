@@ -35,6 +35,7 @@ function setup()
     turn_penalty              = 5,
     turn_bias                 = 1.4,
     use_public_transport      = false,
+    maxspeed_threshold        = 50,
 
     allowed_start_modes = Set {
       mode.cycling,
@@ -64,14 +65,23 @@ function setup()
 
     restricted_access_tag_list = Set {
       'destination'
-	},
+	  },
 
     restricted_highway_whitelist = Set { },
 
     -- tags disallow access to in combination with highway=service
     service_access_tag_blacklist = Set {
-	  'drive-through'
-	},
+	    'drive-through'
+	  },
+
+    service_penalties = {
+      alley             = 0.8,
+      parking           = 0.8,
+      parking_aisle     = 0.8,
+      driveway          = 0.8,
+      ["drive-through"] = 0.8,
+      ["drive-thru"] = 0.8
+    },
 
     construction_whitelist = Set {
       'no',
@@ -192,7 +202,8 @@ function setup()
       grass = 6,
       mud = 3,
       sand = 3,
-      sett = 9
+      sett = 9,
+      default = default_speed - 4
     },
 
     surface_rate_factor = {
@@ -564,9 +575,9 @@ function safety_handler(profile,way,result,data)
 
 	-- roads where cars drive fast (high maxspeed) are penalized
 	-- Only penalize when higher than 30km/h
-	if car_maxspeed > 30 then
+	if car_maxspeed > profile.maxspeed_threshold then
 	    -- Penalize for -0.1 if maxspeed 40, to -1.1 if maxspeed 110
-		car_maxspeed_penalty = (car_maxspeed - 30) / 300
+		car_maxspeed_penalty = (car_maxspeed - profile.maxspeed_threshold) / 300
 		safety_penalty = safety_penalty - car_maxspeed_penalty
 	end
 	
@@ -611,82 +622,6 @@ function safety_handler(profile,way,result,data)
       if result.duration > 0 then
         result.weight = result.duration / safety_bonus
       end
-    end
-  end
-end
-
-function highway_path_handler(profile,way,result,data)
-  -- mtb:scale handling for paths
-  if data.highway == "path" then
-    local mtb_scale = way:get_value_by_key("mtb:scale")
-    local speed = nil
-
-    if mtb_scale and profile.path_mtb_scale_speeds[mtb_scale] then
-      speed = math.min(profile.path_mtb_scale_speeds[mtb_scale], result.forward_speed)
-    elseif mtb_scale then
-      local mtb_scale_number = mtb_scale:match("%d+")
-      if mtb_scale_number and profile.path_mtb_scale_speeds[mtb_scale_number] then
-        speed = math.min(profile.path_mtb_scale_speeds[mtb_scale_number], result.forward_speed)
-      else
-      -- mtb:scale was not on the table
-      speed = profile.walking_speed
-      result.forward_mode = mode.pushing_bike
-      result.backward_mode = mode.pushing_bike
-      end
-    else
-      -- no mtb:scale tag
-      speed = profile.walking_speed
-      result.forward_mode = mode.pushing_bike
-      result.backward_mode = mode.pushing_bike
-    end
-    result.forward_speed = speed
-    result.backward_speed = speed
-
-    -- check width
-    local width = math.huge
-    local width_string = way:get_value_by_key("width")
-    if width_string and tonumber(width_string:match("%d*%.?%d+")) then
-      width = tonumber(width_string:match("%d*%.?%d+"))
-    end
-    if width < profile.bicycle_width then
-      result.forward_mode = mode.pushing_bike
-      result.backward_mode = mode.pushing_bike
-      result.forward_speed = profile.walking_speed
-      result.backward_speed = profile.walking_speed
-    end
-
-    -- check trail_visibility
-    local trail_visibility = way:get_value_by_key("trail_visibility")
-    if trail_visibility and not profile.bicycle_trail_visibility_tag_whitelist[trail_visibility] then
-      result.forward_mode = mode.pushing_bike
-      result.backward_mode = mode.pushing_bike
-      result.forward_speed = profile.walking_speed
-      result.backward_speed = profile.walking_speed
-    end
-  end
-end
-
-function highway_track_handler(profile,way,result,data)
-  -- mtb:scale handling for tracks
-  if data.highway == "track" then
-    local mtb_scale = way:get_value_by_key("mtb:scale")
-    if mtb_scale and profile.track_mtb_scale_speeds[mtb_scale] then
-      result.forward_speed = math.max(profile.track_mtb_scale_speeds[mtb_scale], result.forward_speed)
-      result.backward_speed = math.max(profile.track_mtb_scale_speeds[mtb_scale], result.forward_speed)
-    end
-  end
-end
-
-function adjust_rate_for_surface(profile,way,result,data)
-  -- this needs to be after the safety_handler
-  local surface = way:get_value_by_key("surface")
-  if surface and profile.surface_rate_factor[surface] then
-    local surface_factor = profile.surface_rate_factor[surface]
-    if result.forward_rate > 0 then
-      result.forward_rate = result.forward_rate * surface_factor
-    end
-    if result.backward_rate > 0 then
-      result.backward_rate = result.backward_rate * surface_factor
     end
   end
 end
@@ -757,7 +692,7 @@ function process_way(profile, way, result)
     handle_bicycle_tags,
 
     -- compute speed taking into account way type, maxspeed tags, etc.
-    WayHandlers.surface,
+    Trailmap.surface,
 
       -- compute speed with mtb:scale tag for all paths
     Trailmap.highway_path_handler,
@@ -765,11 +700,14 @@ function process_way(profile, way, result)
     -- compute speed for tracks with mtb:scale tag
     Trailmap.highway_track_handler,
 
-    -- adjust for biking safety
+    -- penalise certain access tags e.g. service=xxxx
+    Trailmap.penalties,
+
+    -- adjust for biking safety - also sets rate based on speed! So after this only rate adjustments!
     safety_handler,
 
     -- adjust for rate preferences on various surfaces
-    adjust_rate_for_surface,
+    Trailmap.adjust_rate_for_surface,
 
     -- handle turn lanes and road classification, used for guidance
     WayHandlers.classification,

@@ -35,6 +35,7 @@ function setup()
     turn_penalty              = 5,
     turn_bias                 = 1.4,
     use_public_transport      = false,
+    maxspeed_threshold        = 40,
 
     allowed_start_modes = Set {
       mode.cycling,
@@ -64,14 +65,23 @@ function setup()
 
     restricted_access_tag_list = Set {
       'destination'
-	},
+	  },
 
     restricted_highway_whitelist = Set { },
 
     -- tags disallow access to in combination with highway=service
     service_access_tag_blacklist = Set {
-	  'drive-through'
-	},
+	    'drive-through'
+	  },
+
+    service_penalties = {
+      alley             = 0.8,
+      parking           = 0.8,
+      parking_aisle     = 0.8,
+      driveway          = 0.8,
+      ["drive-through"] = 0.8,
+      ["drive-thru"] = 0.8
+    },
 
     construction_whitelist = Set {
       'no',
@@ -192,7 +202,8 @@ function setup()
       grass = default_speed - 4,
       mud = default_speed - 10,
       sand = default_speed,
-      sett = default_speed
+      sett = default_speed,
+      default = default_speed
     },
 
     surface_rate_factor = {
@@ -247,10 +258,10 @@ function setup()
       ['0+'] = default_speed,
       ['0'] = default_speed,
       ['1'] = default_speed - 3,
-      ['2'] = default_speed - 8,
+      ['2'] = default_speed - 7,
       ['3'] = default_speed - 12,
-      ['4'] = default_speed - 16,
-      ['5'] = default_speed - 17
+      ['4'] = walking_speed,
+      ['5'] = walking_speed
     },
 
     track_mtb_scale_speeds = {
@@ -259,7 +270,7 @@ function setup()
       ['1'] = default_speed - 3,
       ['2'] = default_speed - 8,
       ['3'] = default_speed - 12,
-      ['4'] = default_speed - 16
+      ['4'] = walking_speed
     },
 
     bicycle_trail_visibility_tag_whitelist = Set {
@@ -572,9 +583,9 @@ function safety_handler(profile,way,result,data)
 
 	-- roads where cars drive fast (high maxspeed) are penalized
 	-- Only penalize when higher than 30km/h
-	if car_maxspeed > 30 then
+	if car_maxspeed > profile.maxspeed_threshold then
 	    -- Penalize for -0.1 if maxspeed 40, to -1.1 if maxspeed 110
-		car_maxspeed_penalty = (car_maxspeed - 30) / 300
+		car_maxspeed_penalty = (car_maxspeed - profile.maxspeed_threshold) / 300
 		safety_penalty = safety_penalty - car_maxspeed_penalty
 	end
 	
@@ -619,20 +630,6 @@ function safety_handler(profile,way,result,data)
       if result.duration > 0 then
         result.weight = result.duration / safety_bonus
       end
-    end
-  end
-end
-
-function adjust_rate_for_surface(profile,way,result,data)
-  -- this needs to be after the safety_handler
-  local surface = way:get_value_by_key("surface")
-  if surface and profile.surface_rate_factor[surface] then
-    local surface_factor = profile.surface_rate_factor[surface]
-    if result.forward_rate > 0 then
-      result.forward_rate = result.forward_rate * surface_factor
-    end
-    if result.backward_rate > 0 then
-      result.backward_rate = result.backward_rate * surface_factor
     end
   end
 end
@@ -703,7 +700,7 @@ function process_way(profile, way, result)
     handle_bicycle_tags,
 
     -- compute speed taking into account way type, maxspeed tags, etc.
-    WayHandlers.surface,
+    Trailmap.surface,
 
     -- compute speed with mtb:scale tag for all paths
     Trailmap.highway_path_handler,
@@ -711,11 +708,14 @@ function process_way(profile, way, result)
     -- compute speed for tracks with mtb:scale tag
     Trailmap.highway_track_handler,
 
-    -- adjust for biking safety
+    -- penalise certain access tags e.g. service=xxxx
+    Trailmap.penalties,
+
+    -- adjust for biking safety - also sets rate based on speed! So after this only rate adjustments!
     safety_handler,
 
     -- adjust for rate preferences on various surfaces
-    adjust_rate_for_surface,
+    Trailmap.adjust_rate_for_surface,
 
     -- handle turn lanes and road classification, used for guidance
     WayHandlers.classification,

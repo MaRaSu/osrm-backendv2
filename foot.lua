@@ -22,7 +22,8 @@ function setup()
 
     default_mode            = mode.walking,
     default_speed           = walking_speed,
-    oneway_handling         = 'specific',     -- respect 'oneway:foot' but not 'oneway'
+    oneway_handling         = 'specific',     -- respect 'oneway:foot' but not 'oneway',
+    maxspeed_threshold        = 40,
 
     barrier_blacklist = Set {
       'yes',
@@ -123,7 +124,8 @@ function setup()
       gravel =        walking_speed*0.75,
       pebblestone =   walking_speed*0.75,
       mud =           walking_speed*0.5,
-      sand =          walking_speed*0.5
+      sand =          walking_speed*0.5,
+      default =       walking_speed
     },
 
     tracktype_speeds = {
@@ -225,7 +227,7 @@ function process_way(profile, way, result)
     WayHandlers.speed,
     
     -- do not adjust for surface when on foot
-    -- WayHandlers.surface,
+    -- Trailmap.surface,
 
     -- handle turn lanes and road classification, used for guidance
     WayHandlers.classification,
