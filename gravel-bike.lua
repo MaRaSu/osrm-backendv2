@@ -36,6 +36,7 @@ function setup()
     turn_bias                 = 1.4,
     use_public_transport      = false,
     maxspeed_threshold        = 50,
+    vegetation_penalty        = 0.7,
 
     allowed_start_modes = Set {
       mode.cycling,
@@ -43,7 +44,6 @@ function setup()
     },
 
     barrier_blacklist = Set {
-      'yes',
       'wall',
       'fence'
     },
@@ -57,10 +57,7 @@ function setup()
 
     access_tag_blacklist = Set {
       'no',
-      'private',
-      'agricultural',
-      'forestry',
-      'delivery'
+      'private'
     },
 
     restricted_access_tag_list = Set {
@@ -91,7 +88,6 @@ function setup()
 
     access_tags_hierarchy = Sequence {
       'bicycle',
-      'vehicle',
       'access'
     },
 
@@ -192,9 +188,9 @@ function setup()
       paving_stones = 10,
       compacted = default_speed - 2,
       cobblestone = 7,
-      unpaved = default_speed - 4,
-      fine_gravel = default_speed - 4,
-      gravel = default_speed - 8,
+      unpaved = default_speed - 3,
+      fine_gravel = default_speed - 3,
+      gravel = default_speed - 6,
       pebblestone = 6,
       ground = 10,
       dirt = 8,
@@ -203,7 +199,7 @@ function setup()
       mud = 3,
       sand = 3,
       sett = 9,
-      default = default_speed - 4
+      default = default_speed - 3
     },
 
     surface_rate_factor = {
@@ -286,19 +282,10 @@ function process_node(profile, node, result)
   local highway = node:get_value_by_key("highway")
   local is_crossing = highway and highway == "crossing"
 
-  local access = find_access_tag(node, profile.access_tags_hierarchy)
-  if access and access ~= "" then
-    -- access restrictions on crossing nodes are not relevant for
-    -- the traffic on the road
-    if profile.access_tag_blacklist[access] and not is_crossing then
-      result.barrier = true
-    end
-  else
-    local barrier = node:get_value_by_key("barrier")
-    if barrier and "" ~= barrier then
-      if profile.barrier_blacklist[barrier] then
+  local barrier = node:get_value_by_key("barrier")
+  if barrier and "" ~= barrier then
+    if profile.barrier_blacklist[barrier] then
         result.barrier = true
-      end
     end
   end
 
@@ -353,6 +340,7 @@ function handle_bicycle_tags(profile,way,result,data)
   data.foot_backward = way:get_value_by_key("foot:backward")
   data.bicycle = way:get_value_by_key("bicycle")
 
+  -- Sets first time the result.forward_speed
   speed_handler(profile,way,result,data)
 
   oneway_handler(profile,way,result,data)
@@ -688,7 +676,7 @@ function process_way(profile, way, result)
     -- toll=yes and oneway=reversible
     WayHandlers.blocked_ways,
 
-    -- our main handler
+    -- our main handler - sets the result.forward_speed first time
     handle_bicycle_tags,
 
     -- compute speed taking into account way type, maxspeed tags, etc.

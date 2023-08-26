@@ -24,9 +24,9 @@ function setup()
     default_speed           = walking_speed,
     oneway_handling         = 'specific',     -- respect 'oneway:foot' but not 'oneway',
     maxspeed_threshold        = 40,
+    vegetation_penalty        = 0.7,
 
     barrier_blacklist = Set {
-      'yes',
       'wall',
       'fence'
     },
@@ -40,10 +40,7 @@ function setup()
 
     access_tag_blacklist = Set {
       'no',
-      'agricultural',
-      'forestry',
-      'private',
-      'delivery',
+      'private'
     },
 
     restricted_access_tag_list = Set { },
@@ -138,21 +135,10 @@ end
 
 function process_node(profile, node, result)
   -- parse access and barrier tags
-  local access = find_access_tag(node, profile.access_tags_hierarchy)
-  if access then
-    if profile.access_tag_blacklist[access] then
-      result.barrier = true
-    end
-  else
-    local barrier = node:get_value_by_key("barrier")
-    if barrier then
-      --  make an exception for rising bollard barriers
-      local bollard = node:get_value_by_key("bollard")
-      local rising_bollard = bollard and "rising" == bollard
-
-      if profile.barrier_blacklist[barrier] and not rising_bollard then
+  local barrier = node:get_value_by_key("barrier")
+  if barrier and "" ~= barrier then
+    if profile.barrier_blacklist[barrier] then
         result.barrier = true
-      end
     end
   end
 

@@ -36,6 +36,7 @@ function setup()
     turn_bias                 = 1.4,
     use_public_transport      = false,
     maxspeed_threshold        = 40,
+    vegetation_penalty        = 0.7,
 
     allowed_start_modes = Set {
       mode.cycling,
@@ -43,7 +44,6 @@ function setup()
     },
 
     barrier_blacklist = Set {
-      'yes',
       'wall',
       'fence'
     },
@@ -57,10 +57,7 @@ function setup()
 
     access_tag_blacklist = Set {
       'no',
-      'private',
-      'agricultural',
-      'forestry',
-      'delivery'
+      'private'
     },
 
     restricted_access_tag_list = Set {
@@ -91,7 +88,6 @@ function setup()
 
     access_tags_hierarchy = Sequence {
       'bicycle',
-      'vehicle',
       'access'
     },
 
@@ -294,19 +290,10 @@ function process_node(profile, node, result)
   local highway = node:get_value_by_key("highway")
   local is_crossing = highway and highway == "crossing"
 
-  local access = find_access_tag(node, profile.access_tags_hierarchy)
-  if access and access ~= "" then
-    -- access restrictions on crossing nodes are not relevant for
-    -- the traffic on the road
-    if profile.access_tag_blacklist[access] and not is_crossing then
-      result.barrier = true
-    end
-  else
-    local barrier = node:get_value_by_key("barrier")
-    if barrier and "" ~= barrier then
-      if profile.barrier_blacklist[barrier] then
+  local barrier = node:get_value_by_key("barrier")
+  if barrier and "" ~= barrier then
+    if profile.barrier_blacklist[barrier] then
         result.barrier = true
-      end
     end
   end
 

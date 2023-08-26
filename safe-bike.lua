@@ -36,6 +36,7 @@ function setup()
     turn_bias                 = 1.4,
     use_public_transport      = true,
     maxspeed_threshold        = 40,
+    vegetation_penalty        = 0.7,
 
     allowed_start_modes = Set {
       mode.cycling,
@@ -43,7 +44,6 @@ function setup()
     },
 
     barrier_blacklist = Set {
-      'yes',
       'wall',
       'fence'
     },
@@ -57,10 +57,7 @@ function setup()
 
     access_tag_blacklist = Set {
       'no',
-      'private',
-      'agricultural',
-      'forestry',
-      'delivery',
+      'private'
       -- When a way is tagged with `use_sidepath` a parallel way suitable for
       -- cyclists is mapped and must be used instead (by law). This tag is
       -- used on ways that normally may be used by cyclists, but not when
@@ -96,7 +93,6 @@ function setup()
 
     access_tags_hierarchy = Sequence {
       'bicycle',
-      'vehicle',
       'access'
     },
 
@@ -197,7 +193,7 @@ function setup()
       cobblestone = 7,
       unpaved = default_speed - 4,
       fine_gravel = default_speed - 2,
-      gravel = default_speed - 8,
+      gravel = default_speed - 6,
       pebblestone = 6,
       ground = 10,
       dirt = 8,
@@ -289,19 +285,10 @@ function process_node(profile, node, result)
   local highway = node:get_value_by_key("highway")
   local is_crossing = highway and highway == "crossing"
 
-  local access = find_access_tag(node, profile.access_tags_hierarchy)
-  if access and access ~= "" then
-    -- access restrictions on crossing nodes are not relevant for
-    -- the traffic on the road
-    if profile.access_tag_blacklist[access] and not is_crossing then
-      result.barrier = true
-    end
-  else
-    local barrier = node:get_value_by_key("barrier")
-    if barrier and "" ~= barrier then
-      if profile.barrier_blacklist[barrier] then
+  local barrier = node:get_value_by_key("barrier")
+  if barrier and "" ~= barrier then
+    if profile.barrier_blacklist[barrier] then
         result.barrier = true
-      end
     end
   end
 

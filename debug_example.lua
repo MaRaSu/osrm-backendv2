@@ -23,14 +23,16 @@ local pprint = require('lib/pprint')
 local Debug = require('lib/profile_debugger')
 
 -- load the profile we want to debug
-Debug.load_profile('road-bike') 
+Debug.load_profile('gravel-bike') 
 
 -- define some input tags. they would normally by extracted from OSM data,
 -- but here we can set them manually which makes debugging the profile eaiser
 
 local way = {
-  highway = 'residential',
+  highway = 'path',
   name = 'Kirkkopolku',
+  ['mtb:scale'] = '0',
+  obstacle = 'vegetation'
 }
 
 -- output will go here

@@ -49,6 +49,13 @@ function Trailmap.highway_path_handler(profile,way,result,data)
       result.forward_speed = profile.walking_speed
       result.backward_speed = profile.walking_speed
     end
+
+		-- check obstacle = vegetation
+		local obstacle = way:get_value_by_key("obstacle")
+		if obstacle and obstacle == "vegetation" then
+			result.forward_speed = result.forward_speed * profile.vegetation_penalty
+			result.backward_speed = result.backward_speed * profile.vegetation_penalty
+		end
   end
 end
 
