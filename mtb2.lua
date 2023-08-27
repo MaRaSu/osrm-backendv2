@@ -183,6 +183,7 @@ function setup()
       chipseal = default_speed,
       concrete = default_speed,
       concrete_lanes = default_speed,
+      paved = default_speed,
       wood = default_speed,
       ["cobblestone:flattened"] = default_speed,
       paving_stones = default_speed,
@@ -207,6 +208,7 @@ function setup()
       chipseal = paved_surface_factor,
       concrete = paved_surface_factor,
       concrete_lanes = paved_surface_factor,
+      paved = paved_surface_factor,
       wood = 1,
       ["cobblestone:flattened"] = 1,
       paving_stones = 1,
@@ -251,7 +253,7 @@ function setup()
     },
 
     path_mtb_scale_speeds = {
-      ['0+'] = default_speed,
+      ['0-'] = default_speed,
       ['0'] = default_speed,
       ['1'] = default_speed - 3,
       ['2'] = default_speed - 5,
@@ -261,7 +263,7 @@ function setup()
     },
 
     track_mtb_scale_speeds = {
-      ['0+'] = default_speed,
+      ['0-'] = default_speed,
       ['0'] = default_speed,
       ['1'] = default_speed - 3,
       ['2'] = default_speed - 5,
@@ -275,7 +277,8 @@ function setup()
       'intermediate'
     },
 
-    bicycle_width = 0.2,
+    bicycle_width_limit = 0.2,
+    bicycle_width_threshold = 0.7,
 
     avoid = Set {
       'impassable',

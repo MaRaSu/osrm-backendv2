@@ -31,8 +31,9 @@ Debug.load_profile('gravel-bike')
 local way = {
   highway = 'path',
   name = 'Kirkkopolku',
-  ['mtb:scale'] = '0',
-  obstacle = 'vegetation'
+  surface = 'fine_gravel',
+  width = '0.8',
+  ["mtb:scale"] = '0'
 }
 
 -- output will go here

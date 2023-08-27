@@ -140,8 +140,8 @@ function setup()
       service = default_speed,
 	    footway = 14,
       pedestrian = 18,
-      track = 15,
-      path = 15
+      track = default_speed - 3,
+      path = default_speed - 6,
     },
 
     pedestrian_speeds = {
@@ -183,6 +183,7 @@ function setup()
       chipseal = default_speed,
       concrete = default_speed,
       concrete_lanes = default_speed,
+      paved = default_speed,
       wood = 10,
       ["cobblestone:flattened"] = 10,
       paving_stones = 10,
@@ -191,13 +192,13 @@ function setup()
       unpaved = default_speed - 3,
       fine_gravel = default_speed - 3,
       gravel = default_speed - 6,
-      pebblestone = 6,
-      ground = 10,
-      dirt = 8,
-      earth = 6,
-      grass = 6,
-      mud = 3,
-      sand = 3,
+      pebblestone = default_speed - 6,
+      ground = default_speed - 6,
+      dirt = default_speed - 6,
+      earth = default_speed - 6,
+      grass = default_speed - 6,
+      mud = 6,
+      sand = 10,
       sett = 9,
       default = default_speed - 3
     },
@@ -207,12 +208,13 @@ function setup()
       chipseal = paved_surface_factor,
       concrete = paved_surface_factor,
       concrete_lanes = paved_surface_factor,
+      paved = paved_surface_factor,
       wood = 1,
       ["cobblestone:flattened"] = 1,
       paving_stones = 1,
       compacted = preferred_surface_factor,
       cobblestone = 0.9,
-      unpaved = 1,
+      unpaved = preferred_surface_factor,
       fine_gravel = preferred_surface_factor,
       gravel = 1,
       pebblestone = 0.9,
@@ -238,9 +240,9 @@ function setup()
     tracktype_speeds = {
       grade5 = default_speed - 10,
       grade4 = default_speed - 6,
-      grade3 = default_speed - 4,
-	    grade2 = default_speed - 3,
-	    grade1 = default_speed - 2
+      grade3 = default_speed - 3,
+	    grade2 = default_speed - 1,
+	    grade1 = default_speed
     },
 
     smoothness_speeds = {
@@ -251,13 +253,13 @@ function setup()
     },
 
     path_mtb_scale_speeds = {
-      ['0+'] = default_speed - 2,
+      ['0-'] = default_speed - 2,
       ['0'] = default_speed - 4,
       ['1'] = default_speed - 13
     },
 
     track_mtb_scale_speeds = {
-      ['0+'] = default_speed - 2,
+      ['0-'] = default_speed - 2,
       ['0'] = default_speed - 4,
       ['1'] = default_speed - 13
     },
@@ -267,7 +269,8 @@ function setup()
       'good'
     },
 
-    bicycle_width = 0.4,
+    bicycle_width_limit = 0.3,
+    bicycle_width_threshold = 0.8,
 
     avoid = Set {
       'impassable',

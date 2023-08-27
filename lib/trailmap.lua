@@ -34,12 +34,18 @@ function Trailmap.highway_path_handler(profile,way,result,data)
     if width_string and tonumber(width_string:match("%d*%.?%d+")) then
       width = tonumber(width_string:match("%d*%.?%d+"))
     end
-    if width < profile.bicycle_width then
+    if width < profile.bicycle_width_limit then
       result.forward_mode = mode.pushing_bike
       result.backward_mode = mode.pushing_bike
       result.forward_speed = profile.walking_speed
       result.backward_speed = profile.walking_speed
-    end
+		elseif width < profile.bicycle_width_threshold then
+		  local scaling_factor = (profile.bicycle_width_threshold - width) / (profile.bicycle_width_threshold - profile.bicycle_width_limit)
+    	local penalty = (result.forward_speed - profile.walking_speed) * scaling_factor^2
+			result.forward_speed = result.forward_speed - penalty
+			result.backward_speed = result.backward_speed - penalty
+		end
+
 
     -- check trail_visibility
     local trail_visibility = way:get_value_by_key("trail_visibility")

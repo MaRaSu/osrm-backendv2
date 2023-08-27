@@ -13,8 +13,8 @@ Trailmap = require("lib/trailmap")
 function setup()
   local default_speed = 26
   local walking_speed = 4
-  local paved_surface_factor = 1.0
-  local preferred_surface_factor = 1.3
+  local paved_surface_factor = 1.3
+  local preferred_surface_factor = 1.5
 
   return {
     properties = {
@@ -183,6 +183,7 @@ function setup()
       chipseal = default_speed,
       concrete = default_speed,
       concrete_lanes = default_speed,
+      paved = default_speed,
       wood = 10,
       ["cobblestone:flattened"] = 10,
       paving_stones = default_speed - 6,
@@ -207,6 +208,7 @@ function setup()
       chipseal = paved_surface_factor,
       concrete = paved_surface_factor,
       concrete_lanes = paved_surface_factor,
+      paved = paved_surface_factor,
       wood = 1,
       ["cobblestone:flattened"] = 1,
       paving_stones = 1,
@@ -214,12 +216,12 @@ function setup()
       cobblestone = 0.9,
       unpaved = 1,
       fine_gravel = 1,
-      gravel = 1,
+      gravel = 0.9,
       pebblestone = 0.9,
-      ground = 1,
-      dirt = 1,
-      earth = 1,
-      grass = 1,
+      ground = 0.8,
+      dirt = 0.8,
+      earth = 0.8,
+      grass = 0.8,
       mud = 0.3,
       sand = 0.7,
       sett = 0.9
@@ -251,12 +253,12 @@ function setup()
     },
 
     path_mtb_scale_speeds = {
-      ['0+'] = default_speed - 10,
+      ['0-'] = default_speed - 10,
       ['0'] = default_speed - 16
     },
 
     track_mtb_scale_speeds = {
-      ['0+'] = default_speed - 6,
+      ['0-'] = default_speed - 6,
       ['0'] = default_speed - 12,
       ['1'] = default_speed - 18
     },
@@ -266,7 +268,8 @@ function setup()
       'good'
     },
 
-    bicycle_width = 1,
+    bicycle_width_limit = 0.5,
+    bicycle_width_threshold = 1,
 
     avoid = Set {
       'impassable',
