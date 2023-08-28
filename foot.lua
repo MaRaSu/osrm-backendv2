@@ -72,6 +72,7 @@ function setup()
 
     speeds = Sequence {
       highway = {
+        trunk           = walking_speed,
         primary         = walking_speed,
         primary_link    = walking_speed,
         secondary       = walking_speed,
@@ -88,6 +89,7 @@ function setup()
         steps           = walking_speed,
         pedestrian      = walking_speed,
         footway         = walking_speed,
+        cycleway        = walking_speed,
         pier            = walking_speed,
       },
 

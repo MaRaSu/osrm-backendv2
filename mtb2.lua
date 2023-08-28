@@ -138,14 +138,14 @@ function setup()
       living_street = default_speed,
       road = default_speed,
       service = default_speed,
-	    footway = default_speed,
       pedestrian = default_speed,
       track = default_speed,
       path = default_speed
     },
 
     pedestrian_speeds = {
-      steps = 2
+      steps = 2,
+      footway = walking_speed
     },
 
     railway_speeds = {
@@ -327,10 +327,19 @@ function handle_bicycle_tags(profile,way,result,data)
     return false
   end
 
-  -- access
+  data.foot = way:get_value_by_key("foot")
+  data.foot_forward = way:get_value_by_key("foot:forward")
+  data.foot_backward = way:get_value_by_key("foot:backward")
+  data.bicycle = way:get_value_by_key("bicycle")
+
+  -- access + check for pushing bike if no bicycle access
   data.access = find_access_tag(way, profile.access_tags_hierarchy)
   if data.access and profile.access_tag_blacklist[data.access] then
-    return false
+    result.forward_mode = mode.inaccessible
+    local foot_access = bike_push_handler(profile,way,result,data)
+    if not foot_access then
+      return false
+    end
   end
 
   -- other tags
@@ -346,10 +355,6 @@ function handle_bicycle_tags(profile,way,result,data)
   data.cycleway_right = way:get_value_by_key("cycleway:right")
   data.duration = way:get_value_by_key("duration")
   data.service = way:get_value_by_key("service")
-  data.foot = way:get_value_by_key("foot")
-  data.foot_forward = way:get_value_by_key("foot:forward")
-  data.foot_backward = way:get_value_by_key("foot:backward")
-  data.bicycle = way:get_value_by_key("bicycle")
 
   speed_handler(profile,way,result,data)
 

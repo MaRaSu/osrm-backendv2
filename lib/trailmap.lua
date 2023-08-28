@@ -84,16 +84,18 @@ end
 
 function Trailmap.adjust_rate_for_surface(profile,way,result,data)
   -- this needs to be after the safety_handler
-  local surface = way:get_value_by_key("surface")
-  if surface and profile.surface_rate_factor[surface] then
-    local surface_factor = profile.surface_rate_factor[surface]
-    if result.forward_rate > 0 then
-      result.forward_rate = result.forward_rate * surface_factor
-    end
-    if result.backward_rate > 0 then
-      result.backward_rate = result.backward_rate * surface_factor
-    end
-  end
+	if(result.forward_rate and result.backward_rate) then
+		local surface = way:get_value_by_key("surface")
+		if surface and profile.surface_rate_factor[surface] then
+			local surface_factor = profile.surface_rate_factor[surface]
+			if result.forward_rate > 0 then
+				result.forward_rate = result.forward_rate * surface_factor
+			end
+			if result.backward_rate > 0 then
+				result.backward_rate = result.backward_rate * surface_factor
+			end
+		end
+	end
 end
 
 -- reduce speed on bad surfaces, also option for missing surface tag

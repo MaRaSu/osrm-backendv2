@@ -29,11 +29,10 @@ Debug.load_profile('gravel-bike')
 -- but here we can set them manually which makes debugging the profile eaiser
 
 local way = {
-  highway = 'path',
+  highway = 'footway',
   name = 'Kirkkopolku',
-  surface = 'fine_gravel',
-  width = '0.8',
-  ["mtb:scale"] = '0'
+  surface = 'gravel',
+  ['mtb:scale'] = '0'
 }
 
 -- output will go here
