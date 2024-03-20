@@ -11,7 +11,7 @@ Measure = require("lib/measure")
 Trailmap = require("lib/trailmap")
 
 function setup()
-  local default_speed = 18
+  local default_speed = 15
   local walking_speed = 3
   local paved_surface_factor = 0.7
   local preferred_surface_factor = 1.3
@@ -197,7 +197,7 @@ function setup()
       dirt = default_speed,
       earth = default_speed,
       grass = default_speed - 4,
-      mud = default_speed - 10,
+      mud = default_speed - 6,
       sand = default_speed,
       sett = default_speed,
       default = default_speed
@@ -222,7 +222,7 @@ function setup()
       dirt = 1,
       earth = 1,
       grass = 1,
-      mud = 0.3,
+      mud = 0.8,
       sand = 1,
       sett = 0.9
     },
@@ -238,26 +238,26 @@ function setup()
     },
 
     tracktype_speeds = {
-      grade5 = default_speed - 6,
-      grade4 = default_speed - 4,
-      grade3 = default_speed - 2,
+      grade5 = default_speed,
+      grade4 = default_speed,
+      grade3 = default_speed,
       grade2 = default_speed,
       grade1 = default_speed
     },
 
     smoothness_speeds = {
-      bad = default_speed - 2,
-      very_bad = default_speed - 4,
-      horrible = default_speed - 6,
-      very_horrible = default_speed - 8
+      bad = default_speed,
+      very_bad = default_speed,
+      horrible = default_speed,
+      very_horrible = default_speed - 4
     },
 
     path_mtb_scale_speeds = {
       ['0-'] = default_speed,
       ['0'] = default_speed,
-      ['1'] = default_speed - 3,
-      ['2'] = default_speed - 5,
-      ['3'] = default_speed - 9,
+      ['1'] = default_speed ,
+      ['2'] = default_speed,
+      ['3'] = default_speed - 5,
       ['4'] = walking_speed,
       ['5'] = walking_speed
     },
@@ -265,9 +265,9 @@ function setup()
     track_mtb_scale_speeds = {
       ['0-'] = default_speed,
       ['0'] = default_speed,
-      ['1'] = default_speed - 3,
-      ['2'] = default_speed - 5,
-      ['3'] = default_speed - 9,
+      ['1'] = default_speed,
+      ['2'] = default_speed,
+      ['3'] = default_speed - 5,
       ['4'] = walking_speed
     },
 
