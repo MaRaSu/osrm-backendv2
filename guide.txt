@@ -1,0 +1,5 @@
+## For debugging
+
+lua debug_way.lua
+
+osrm-frontend --> debug-folder --> html-fileet joissa OSRMv2 backend, saa näkyviin vektoritiilet

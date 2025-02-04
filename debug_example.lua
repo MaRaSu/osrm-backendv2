@@ -29,10 +29,15 @@ Debug.load_profile('gravel-bike')
 -- but here we can set them manually which makes debugging the profile eaiser
 
 local way = {
-  highway = 'footway',
-  name = 'Kirkkopolku',
-  surface = 'gravel',
-  ['mtb:scale'] = '0'
+  bicycle = 'designated',
+  foot = 'designated',
+  highway = 'cycleway',
+  horse = 'no',
+  oneway = 'no',
+  segregated = 'no',
+  smoothness = 'excellent',
+  surface = 'asphalt',
+  traffic_sign = 'FI:D6'
 }
 
 -- output will go here

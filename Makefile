@@ -1,14 +1,8 @@
-VERSION = 0.2.5
+VERSION = 0.3.7
 .PHONY: build push 
 
 build: 
-	docker build -t registry.finomena.fi/c/osrm-backendv2:$(VERSION) .
-
-build_h: 
-	docker build -t registry-hetzner.finomena.fi/c/osrm-backendv2:$(VERSION) .
+	docker buildx build --platform linux/amd64 -t registry-hetzner.finomena.fi/osrm-backendv2:$(VERSION) .
 
 push: build
-	docker push registry.finomena.fi/c/osrm-backendv2:$(VERSION)
-
-push_h: build_h
-	docker push registry-hetzner.finomena.fi/c/osrm-backendv2:$(VERSION)
+	docker push registry-hetzner.finomena.fi/osrm-backendv2:$(VERSION)
